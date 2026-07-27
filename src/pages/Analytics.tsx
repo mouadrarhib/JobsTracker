@@ -6,6 +6,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -22,6 +23,17 @@ import { CONTACT_STATUS_META } from '../contactStatusConfig'
 const GRID = '#E1E0D9'
 const AXIS_TEXT = { fill: '#898781', fontSize: 11, fontFamily: 'Inter, sans-serif' }
 const CARD = 'rounded-xl2 border border-ink/8 bg-paper-card p-5 shadow-card'
+
+// Ordinal blue ramp (steps 250/350/450/550/650) for the funnel — stages are ordered
+// progress, not independent categories, so one hue light-to-dark per the dataviz skill.
+const FUNNEL_RAMP = ['#86B6EF', '#5598E7', '#2A78D6', '#1C5CAB', '#104281']
+const FUNNEL_STAGES = [
+  { label: 'Applied', statuses: ['Applied', 'Phone Screen', 'Interview', 'Technical Test', 'Offer', 'Rejected', 'Withdrawn'] },
+  { label: 'Phone Screen+', statuses: ['Phone Screen', 'Interview', 'Technical Test', 'Offer'] },
+  { label: 'Interview+', statuses: ['Interview', 'Technical Test', 'Offer'] },
+  { label: 'Technical Test+', statuses: ['Technical Test', 'Offer'] },
+  { label: 'Offer', statuses: ['Offer'] },
+] as const
 
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
@@ -105,6 +117,50 @@ export function Analytics() {
     return buckets
   }, [applications])
 
+  const funnel = useMemo(() => {
+    const submitted = applications.filter((a) => a.status !== 'Wishlist')
+    const total = submitted.length
+    return FUNNEL_STAGES.map((stage, i) => {
+      const count = submitted.filter((a) => (stage.statuses as readonly string[]).includes(a.status)).length
+      return {
+        label: stage.label,
+        count,
+        pct: total === 0 ? 0 : Math.round((count / total) * 100),
+        color: FUNNEL_RAMP[i],
+      }
+    })
+  }, [applications])
+
+  const resumeStats = useMemo(() => {
+    const groups = new Map<string, typeof applications>()
+    for (const app of applications) {
+      const key = app.resumeVersion.trim()
+      if (!key) continue
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key)!.push(app)
+    }
+
+    const rows = Array.from(groups.entries()).map(([version, apps]) => {
+      const submitted = apps.filter((a) => a.status !== 'Wishlist')
+      const responded = submitted.filter((a) => a.status !== 'Applied')
+      const interviewPlus = submitted.filter((a) => ['Interview', 'Technical Test', 'Offer'].includes(a.status))
+      const offers = submitted.filter((a) => a.status === 'Offer')
+      return {
+        version,
+        applied: submitted.length,
+        responseRate: submitted.length === 0 ? 0 : Math.round((responded.length / submitted.length) * 100),
+        interviewRate: submitted.length === 0 ? 0 : Math.round((interviewPlus.length / submitted.length) * 100),
+        offers: offers.length,
+      }
+    })
+    rows.sort((a, b) => b.applied - a.applied)
+
+    const trackedCount = Array.from(groups.values()).reduce((sum, apps) => sum + apps.length, 0)
+    const unspecified = applications.length - trackedCount
+
+    return { rows, unspecified }
+  }, [applications])
+
   const contactStatusBreakdown = useMemo(
     () =>
       CONTACT_STATUSES.map((status) => ({
@@ -179,6 +235,71 @@ export function Analytics() {
           </ResponsiveContainer>
         </ChartCard>
 
+        <ChartCard title="Funnel" subtitle="Of everything you've applied to, how far it got">
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart
+              data={funnel}
+              layout="vertical"
+              margin={{ top: 0, right: 40, left: 0, bottom: 0 }}
+              barCategoryGap={12}
+            >
+              <CartesianGrid stroke={GRID} horizontal={false} />
+              <XAxis type="number" allowDecimals={false} tick={AXIS_TEXT} axisLine={false} tickLine={false} />
+              <YAxis
+                type="category"
+                dataKey="label"
+                tick={{ ...AXIS_TEXT, fill: '#52514E' }}
+                axisLine={false}
+                tickLine={false}
+                width={100}
+              />
+              <Tooltip
+                cursor={{ fill: 'rgba(27,36,48,0.04)' }}
+                content={({ active, payload }) =>
+                  active && payload?.length ? (
+                    <TooltipBox
+                      label={payload[0].payload.label}
+                      value={`${payload[0].payload.count} applications (${payload[0].payload.pct}%)`}
+                    />
+                  ) : null
+                }
+              />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={24}>
+                {funnel.map((entry) => (
+                  <Cell key={entry.label} fill={entry.color} />
+                ))}
+                <LabelList
+                  dataKey="count"
+                  position="right"
+                  content={(props) => {
+                    const { x, y, width, height, index } = props as {
+                      x: number
+                      y: number
+                      width: number
+                      height: number
+                      index: number
+                    }
+                    const stage = funnel[index]
+                    if (!stage) return null
+                    return (
+                      <text
+                        x={x + width + 8}
+                        y={y + height / 2}
+                        dy={4}
+                        fontSize={11}
+                        fill="#1B2430"
+                        fontFamily="Inter, sans-serif"
+                      >
+                        {stage.count} ({stage.pct}%)
+                      </text>
+                    )
+                  }}
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <ChartCard title="Status breakdown" subtitle="Applications per pipeline stage">
             <ResponsiveContainer width="100%" height={280}>
@@ -234,6 +355,51 @@ export function Analytics() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
+
+        {resumeStats.rows.length > 0 && (
+          <ChartCard title="Resume performance" subtitle="Response, interview, and offer rate by resume version">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-ink/8">
+                    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Resume version
+                    </th>
+                    <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Applied
+                    </th>
+                    <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Response rate
+                    </th>
+                    <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Interview rate
+                    </th>
+                    <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Offers
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink/6">
+                  {resumeStats.rows.map((row) => (
+                    <tr key={row.version}>
+                      <td className="px-3 py-2.5 text-sm font-medium text-ink">{row.version}</td>
+                      <td className="px-3 py-2.5 text-right font-mono text-sm text-ink-dim">{row.applied}</td>
+                      <td className="px-3 py-2.5 text-right font-mono text-sm text-ink-dim">{row.responseRate}%</td>
+                      <td className="px-3 py-2.5 text-right font-mono text-sm text-ink-dim">{row.interviewRate}%</td>
+                      <td className="px-3 py-2.5 text-right font-mono text-sm text-ink-dim">{row.offers}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {resumeStats.unspecified > 0 && (
+              <p className="mt-3 text-xs text-ink-dim">
+                {resumeStats.unspecified} application{resumeStats.unspecified === 1 ? '' : 's'} without a resume
+                version logged aren't included above.
+              </p>
+            )}
+          </ChartCard>
+        )}
 
         {contactStats.total > 0 && (
           <>
