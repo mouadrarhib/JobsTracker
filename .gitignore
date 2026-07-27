@@ -25,3 +25,6 @@ dist-ssr
 # npx skills add supabase/agent-skills
 .agents/
 .claude/skills/
+
+.vercel
+.env*
