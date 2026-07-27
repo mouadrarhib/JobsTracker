@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useApplicationsStore } from '../hooks/useApplicationsStore'
 import { useDrawer } from '../hooks/useDrawer'
 import { useAuth } from '../hooks/useAuth'
-import { dataService } from '../services/dataService'
+import { ExportModal } from './ExportModal'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', end: true },
@@ -20,24 +21,11 @@ function StampMark() {
   )
 }
 
-async function handleExport() {
-  const applications = await dataService.exportAll()
-  const blob = new Blob([JSON.stringify(applications, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  const date = new Date().toISOString().slice(0, 10)
-  a.href = url
-  a.download = `masar-applications-${date}.json`
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  URL.revokeObjectURL(url)
-}
-
 export function Sidebar() {
   const { applications } = useApplicationsStore()
   const { openCreate } = useDrawer()
   const { user, signOut } = useAuth()
+  const [exportOpen, setExportOpen] = useState(false)
 
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col bg-ink text-paper/90">
@@ -78,10 +66,10 @@ export function Sidebar() {
           {applications.length} application{applications.length === 1 ? '' : 's'} logged
         </p>
         <button
-          onClick={handleExport}
+          onClick={() => setExportOpen(true)}
           className="w-full rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-paper/70 transition hover:border-white/30 hover:text-paper"
         >
-          Export data as JSON
+          Export data...
         </button>
         {user && (
           <div className="flex items-center justify-between gap-2 pt-1">
@@ -97,6 +85,8 @@ export function Sidebar() {
           </div>
         )}
       </div>
+
+      {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
     </aside>
   )
 }

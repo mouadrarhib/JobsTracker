@@ -6,45 +6,15 @@ import { PageHeader } from '../components/PageHeader'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { StatusBadge } from '../components/StatusBadge'
 import { StatCard } from '../components/StatCard'
-import { ACTIVE_STATUSES } from '../statusConfig'
+import { computeApplicationSummary, computeContactSummary } from '../utils/analytics'
 
 export function Dashboard() {
   const { applications, loading } = useApplicationsStore()
   const { contacts } = useContactsStore()
   const { openCreate, openView } = useDrawer()
 
-  const stats = useMemo(() => {
-    const total = applications.length
-    const active = applications.filter((a) => ACTIVE_STATUSES.includes(a.status)).length
-
-    const now = new Date()
-    const interviewsThisMonth = applications.filter((a) => {
-      if (a.status !== 'Interview') return false
-      const d = new Date(a.dateLastUpdated)
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-    }).length
-
-    const averageScore = total === 0 ? 0 : Math.round(applications.reduce((sum, a) => sum + a.score, 0) / total)
-
-    const submitted = applications.filter((a) => a.status !== 'Wishlist')
-    const responded = submitted.filter((a) => a.status !== 'Applied')
-    const responseRate = submitted.length === 0 ? 0 : Math.round((responded.length / submitted.length) * 100)
-
-    return { total, active, interviewsThisMonth, averageScore, responseRate }
-  }, [applications])
-
-  const networkStats = useMemo(() => {
-    const interviewingMe = contacts.filter((c) => c.status === 'Interviewing Me').length
-    const awaitingResponse = contacts.filter((c) => c.status === 'Reached Out').length
-    const calledMe = contacts.filter((c) => c.status === 'Called Me').length
-
-    const outbound = contacts.filter((c) => c.status !== 'Called Me')
-    const resolved = outbound.filter((c) => c.status !== 'Reached Out')
-    const responded = resolved.filter((c) => c.status !== 'No Response')
-    const responseRate = resolved.length === 0 ? 0 : Math.round((responded.length / resolved.length) * 100)
-
-    return { total: contacts.length, interviewingMe, awaitingResponse, calledMe, responseRate }
-  }, [contacts])
+  const stats = useMemo(() => computeApplicationSummary(applications), [applications])
+  const networkStats = useMemo(() => computeContactSummary(contacts), [contacts])
 
   const recent = useMemo(
     () =>
