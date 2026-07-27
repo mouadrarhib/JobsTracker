@@ -7,7 +7,7 @@ type Mode = 'signIn' | 'signUp'
 const inputClass =
   'mt-1.5 w-full rounded-lg border border-white/15 bg-ink px-3 py-2 text-sm text-paper placeholder:text-paper/30 focus:border-saffron focus:outline-none focus:ring-2 focus:ring-saffron/20'
 
-export function Login() {
+export function Login({ onBack }: { onBack?: () => void }) {
   const { signIn, signUp } = useAuth()
   const [mode, setMode] = useState<Mode>('signIn')
   const [email, setEmail] = useState('')
@@ -44,7 +44,15 @@ export function Login() {
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-ink px-4">
+    <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-ink px-4">
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="w-full max-w-sm text-left text-xs font-medium text-paper/50 transition hover:text-paper/80"
+        >
+          ← Back
+        </button>
+      )}
       <div className="w-full max-w-sm rounded-xl2 border border-white/10 bg-ink-soft p-8 shadow-panel">
         <div className="mb-6 flex items-center gap-2.5">
           <span className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-saffron">

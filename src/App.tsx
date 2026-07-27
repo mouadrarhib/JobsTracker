@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { Sidebar } from './components/Sidebar'
 import { ApplicationDrawer } from './components/ApplicationDrawer'
@@ -16,15 +17,25 @@ import { ApplicationsTable } from './pages/ApplicationsTable'
 import { Contacts } from './pages/Contacts'
 import { Analytics } from './pages/Analytics'
 
+const Landing = lazy(() => import('./pages/Landing').then((m) => ({ default: m.Landing })))
+
 function AuthGate() {
   const { user, loading } = useAuth()
+  const [view, setView] = useState<'landing' | 'login'>('landing')
 
   if (loading) {
     return <div className="flex h-screen w-full items-center justify-center bg-ink" />
   }
 
   if (!user) {
-    return <Login />
+    if (view === 'login') {
+      return <Login onBack={() => setView('landing')} />
+    }
+    return (
+      <Suspense fallback={<div className="flex h-screen w-full items-center justify-center bg-paper" />}>
+        <Landing onGetStarted={() => setView('login')} />
+      </Suspense>
+    )
   }
 
   return (
