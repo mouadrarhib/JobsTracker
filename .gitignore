@@ -1,0 +1,27 @@
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Claude Code local (machine-specific) settings — settings.json (shared) is still tracked
+.claude/settings.local.json
+
+# Installed agent skills (and Claude Code's symlinks to them) — regenerate with:
+# npx skills add supabase/agent-skills
+.agents/
+.claude/skills/
