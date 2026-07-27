@@ -4,7 +4,7 @@
 
 ### *Masār* — Arabic for "path." A job search tracker built for one goal: find work, fast.
 
-[![Live on Vercel](https://img.shields.io/badge/Live-masar--job--tracker.vercel.app-2A78D6?style=for-the-badge&logo=vercel&logoColor=white)](https://masar-job-tracker.vercel.app)
+[![Live](https://img.shields.io/badge/Live-masar.mouadrarhib.com-2A78D6?style=for-the-badge&logo=vercel&logoColor=white)](https://masar.mouadrarhib.com)
 
 [![React](https://img.shields.io/badge/React-18-149ECA?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
