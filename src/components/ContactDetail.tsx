@@ -2,6 +2,7 @@ import type { Contact } from '../types'
 import { useApplicationsStore } from '../hooks/useApplicationsStore'
 import { useDrawer } from '../hooks/useDrawer'
 import { useContactDrawer } from '../hooks/useContactDrawer'
+import { ContactStatusBadge } from './ContactStatusBadge'
 
 function Row({ label, value }: { label: string; value?: string }) {
   if (!value) return null
@@ -39,6 +40,10 @@ export function ContactDetail({
         <div>
           <p className="font-display text-xl font-semibold text-ink">{contact.name}</p>
           {contact.title && <p className="text-sm text-ink-dim">{contact.title}</p>}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <ContactStatusBadge status={contact.status} />
         </div>
 
         {(contact.company || linkedApplication) && (

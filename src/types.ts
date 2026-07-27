@@ -45,6 +45,18 @@ export interface Application {
 
 export type ApplicationInput = Omit<Application, 'id' | 'dateLastUpdated'>
 
+export const CONTACT_STATUSES = [
+  'Reached Out',
+  'Responded',
+  'No Response',
+  'Called Me',
+  'Interviewing Me',
+  'Referred Me',
+  'Cold',
+] as const
+
+export type ContactStatus = (typeof CONTACT_STATUSES)[number]
+
 export interface Contact {
   id: string
   name: string
@@ -54,6 +66,7 @@ export interface Contact {
   email: string
   phone: string
   applicationId: string | null
+  status: ContactStatus
   dateContacted: string
   notes: string
   dateLastUpdated: string

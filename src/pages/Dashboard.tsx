@@ -1,23 +1,16 @@
 import { useMemo } from 'react'
 import { useApplicationsStore } from '../hooks/useApplicationsStore'
+import { useContactsStore } from '../hooks/useContactsStore'
 import { useDrawer } from '../hooks/useDrawer'
 import { PageHeader } from '../components/PageHeader'
 import { ScoreBadge } from '../components/ScoreBadge'
 import { StatusBadge } from '../components/StatusBadge'
+import { StatCard } from '../components/StatCard'
 import { ACTIVE_STATUSES } from '../statusConfig'
-
-function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-xl2 border border-ink/8 bg-paper-card p-5 shadow-card">
-      <p className="text-xs font-medium uppercase tracking-wide text-ink-dim/70">{label}</p>
-      <p className="mt-2 font-display text-3xl font-semibold text-ink">{value}</p>
-      {hint && <p className="mt-1 text-xs text-ink-dim">{hint}</p>}
-    </div>
-  )
-}
 
 export function Dashboard() {
   const { applications, loading } = useApplicationsStore()
+  const { contacts } = useContactsStore()
   const { openCreate, openView } = useDrawer()
 
   const stats = useMemo(() => {
@@ -39,6 +32,19 @@ export function Dashboard() {
 
     return { total, active, interviewsThisMonth, averageScore, responseRate }
   }, [applications])
+
+  const networkStats = useMemo(() => {
+    const interviewingMe = contacts.filter((c) => c.status === 'Interviewing Me').length
+    const awaitingResponse = contacts.filter((c) => c.status === 'Reached Out').length
+    const calledMe = contacts.filter((c) => c.status === 'Called Me').length
+
+    const outbound = contacts.filter((c) => c.status !== 'Called Me')
+    const resolved = outbound.filter((c) => c.status !== 'Reached Out')
+    const responded = resolved.filter((c) => c.status !== 'No Response')
+    const responseRate = resolved.length === 0 ? 0 : Math.round((responded.length / resolved.length) * 100)
+
+    return { total: contacts.length, interviewingMe, awaitingResponse, calledMe, responseRate }
+  }, [contacts])
 
   const recent = useMemo(
     () =>
@@ -77,6 +83,20 @@ export function Dashboard() {
               <StatCard label="Average score" value={String(stats.averageScore)} hint="Match score out of 100" />
               <StatCard label="Response rate" value={`${stats.responseRate}%`} hint="Beyond initial application" />
             </div>
+
+            {networkStats.total > 0 && (
+              <div className="mt-6">
+                <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-dim/70">
+                  Your network
+                </h2>
+                <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
+                  <StatCard label="Interviewing me" value={String(networkStats.interviewingMe)} />
+                  <StatCard label="Awaiting response" value={String(networkStats.awaitingResponse)} />
+                  <StatCard label="Called me first" value={String(networkStats.calledMe)} />
+                  <StatCard label="Response rate" value={`${networkStats.responseRate}%`} hint="People you reached out to" />
+                </div>
+              </div>
+            )}
 
             <div className="mt-8">
               <h2 className="font-display text-sm font-semibold uppercase tracking-wide text-ink-dim/70">

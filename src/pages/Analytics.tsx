@@ -12,9 +12,12 @@ import {
   YAxis,
 } from 'recharts'
 import { useApplicationsStore } from '../hooks/useApplicationsStore'
+import { useContactsStore } from '../hooks/useContactsStore'
 import { PageHeader } from '../components/PageHeader'
-import { STATUSES } from '../types'
+import { StatCard } from '../components/StatCard'
+import { STATUSES, CONTACT_STATUSES } from '../types'
 import { STATUS_META } from '../statusConfig'
+import { CONTACT_STATUS_META } from '../contactStatusConfig'
 
 const GRID = '#E1E0D9'
 const AXIS_TEXT = { fill: '#898781', fontSize: 11, fontFamily: 'Inter, sans-serif' }
@@ -54,6 +57,7 @@ function formatWeekLabel(d: Date) {
 
 export function Analytics() {
   const { applications, loading } = useApplicationsStore()
+  const { contacts } = useContactsStore()
 
   const overTime = useMemo(() => {
     const submitted = applications.filter((a) => a.dateApplied).map((a) => a.dateApplied)
@@ -100,6 +104,26 @@ export function Analytics() {
     }
     return buckets
   }, [applications])
+
+  const contactStatusBreakdown = useMemo(
+    () =>
+      CONTACT_STATUSES.map((status) => ({
+        status,
+        count: contacts.filter((c) => c.status === status).length,
+        color: CONTACT_STATUS_META[status].dot,
+      })),
+    [contacts],
+  )
+
+  const contactStats = useMemo(() => {
+    const outbound = contacts.filter((c) => c.status !== 'Called Me')
+    const resolved = outbound.filter((c) => c.status !== 'Reached Out')
+    const responded = resolved.filter((c) => c.status !== 'No Response')
+    const responseRate = resolved.length === 0 ? 0 : Math.round((responded.length / resolved.length) * 100)
+    const interviewingMe = contacts.filter((c) => c.status === 'Interviewing Me').length
+
+    return { total: contacts.length, responseRate, interviewingMe }
+  }, [contacts])
 
   if (loading) return null
 
@@ -210,6 +234,60 @@ export function Analytics() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
+
+        {contactStats.total > 0 && (
+          <>
+            <h2 className="pt-2 font-display text-sm font-semibold uppercase tracking-wide text-ink-dim/70">
+              Your network
+            </h2>
+
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+              <StatCard label="Contacts logged" value={String(contactStats.total)} />
+              <StatCard label="Response rate" value={`${contactStats.responseRate}%`} hint="People you reached out to" />
+              <StatCard label="Interviewing me" value={String(contactStats.interviewingMe)} />
+            </div>
+
+            <ChartCard title="Contact status breakdown" subtitle="Where each relationship stands">
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart
+                  data={contactStatusBreakdown}
+                  layout="vertical"
+                  margin={{ top: 0, right: 24, left: 0, bottom: 0 }}
+                  barCategoryGap={10}
+                >
+                  <CartesianGrid stroke={GRID} horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={AXIS_TEXT} axisLine={false} tickLine={false} />
+                  <YAxis
+                    type="category"
+                    dataKey="status"
+                    tick={{ ...AXIS_TEXT, fill: '#52514E' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={110}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(27,36,48,0.04)' }}
+                    content={({ active, payload }) =>
+                      active && payload?.length ? (
+                        <TooltipBox label={payload[0].payload.status} value={`${payload[0].value} contacts`} />
+                      ) : null
+                    }
+                  />
+                  <Bar
+                    dataKey="count"
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={20}
+                    label={{ position: 'right', ...AXIS_TEXT, fill: '#1B2430' }}
+                  >
+                    {contactStatusBreakdown.map((entry) => (
+                      <Cell key={entry.status} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          </>
+        )}
       </div>
     </div>
   )

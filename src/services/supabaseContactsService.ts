@@ -1,4 +1,4 @@
-import type { Contact, ContactInput } from '../types'
+import type { Contact, ContactInput, ContactStatus } from '../types'
 import type { ContactsService } from './contactsService'
 import { supabase } from './supabaseClient'
 
@@ -11,6 +11,7 @@ interface ContactRow {
   email: string
   phone: string
   application_id: string | null
+  status: ContactStatus
   date_contacted: string | null
   notes: string
   date_last_updated: string
@@ -26,6 +27,7 @@ function fromRow(row: ContactRow): Contact {
     email: row.email,
     phone: row.phone,
     applicationId: row.application_id,
+    status: row.status,
     dateContacted: row.date_contacted ?? '',
     notes: row.notes,
     dateLastUpdated: row.date_last_updated,
@@ -41,6 +43,7 @@ function toRow(input: Partial<ContactInput>) {
   if (input.email !== undefined) row.email = input.email
   if (input.phone !== undefined) row.phone = input.phone
   if (input.applicationId !== undefined) row.application_id = input.applicationId
+  if (input.status !== undefined) row.status = input.status
   if (input.dateContacted !== undefined) row.date_contacted = input.dateContacted || null
   if (input.notes !== undefined) row.notes = input.notes
   return row

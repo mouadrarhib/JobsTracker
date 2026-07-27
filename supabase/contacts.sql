@@ -13,11 +13,23 @@ create table if not exists public.contacts (
   email text not null default '',
   phone text not null default '',
   application_id uuid references public.applications(id) on delete set null,
+  status text not null default 'Reached Out',
   date_contacted date,
   notes text not null default '',
 
   date_last_updated timestamptz not null default now(),
   created_at timestamptz not null default now()
+);
+
+-- Safe to re-run: adds the status column if this table was created before it existed.
+alter table public.contacts add column if not exists status text not null default 'Reached Out';
+
+alter table public.contacts drop constraint if exists contacts_status_check;
+alter table public.contacts add constraint contacts_status_check check (
+  status in (
+    'Reached Out', 'Responded', 'No Response', 'Called Me',
+    'Interviewing Me', 'Referred Me', 'Cold'
+  )
 );
 
 create index if not exists contacts_user_id_idx on public.contacts (user_id);

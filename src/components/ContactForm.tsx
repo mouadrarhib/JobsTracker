@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import type { ContactInput } from '../types'
+import { CONTACT_STATUSES } from '../types'
 import { useApplicationsStore } from '../hooks/useApplicationsStore'
 
 function emptyContact(applicationId: string | null): ContactInput {
@@ -12,6 +13,7 @@ function emptyContact(applicationId: string | null): ContactInput {
     email: '',
     phone: '',
     applicationId,
+    status: 'Reached Out',
     dateContacted: new Date().toISOString().slice(0, 10),
     notes: '',
   }
@@ -97,6 +99,20 @@ export function ContactForm({
             {applications.map((app) => (
               <option key={app.id} value={app.id}>
                 {app.companyName} — {app.role}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Status">
+          <select
+            className={inputClass}
+            value={values.status}
+            onChange={(e) => set('status', e.target.value as ContactInput['status'])}
+          >
+            {CONTACT_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
           </select>
