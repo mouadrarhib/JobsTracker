@@ -46,7 +46,7 @@ export function Contacts() {
     <div>
       <PageHeader title="Contacts" subtitle="Recruiters and managers you've talked with." />
 
-      <div className="flex flex-wrap items-center justify-between gap-2.5 px-8 pt-5">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 pt-5 md:px-8">
         <div className="flex flex-wrap items-center gap-2.5">
           <input
             className={`${inputClass} w-64`}
@@ -77,7 +77,7 @@ export function Contacts() {
         )}
       </div>
 
-      <div className="px-8 py-5">
+      <div className="px-4 py-5 md:px-8">
         {contacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl2 border border-dashed border-ink/15 py-24 text-center">
             <p className="font-display text-lg font-semibold text-ink">No contacts logged yet</p>
@@ -95,49 +95,73 @@ export function Contacts() {
         ) : filtered.length === 0 ? (
           <p className="py-16 text-center text-sm text-ink-dim">No contacts match your filters.</p>
         ) : (
-          <div className="overflow-hidden rounded-xl2 border border-ink/8 bg-paper-card shadow-card">
-            <table className="w-full border-collapse">
-              <thead className="border-b border-ink/8">
-                <tr>
-                  <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
-                    Name
-                  </th>
-                  <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
-                    Company
-                  </th>
-                  <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
-                    Status
-                  </th>
-                  <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
-                    Linked application
-                  </th>
-                  <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
-                    Contacted
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-ink/6">
-                {filtered.map((contact) => (
-                  <tr
-                    key={contact.id}
-                    onClick={() => openView(contact.id)}
-                    className="cursor-pointer transition hover:bg-paper-dim/50"
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-ink">
-                      {contact.name}
-                      {contact.title && <span className="ml-1.5 text-xs text-ink-dim">{contact.title}</span>}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-ink-dim">{contact.company || '—'}</td>
-                    <td className="px-4 py-3">
-                      <ContactStatusBadge status={contact.status} size="sm" />
-                    </td>
-                    <td className="px-4 py-3 text-sm text-ink-dim">{applicationLabel(contact.applicationId) ?? '—'}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-ink-dim">{contact.dateContacted || '—'}</td>
+          <>
+            <div className="hidden overflow-hidden rounded-xl2 border border-ink/8 bg-paper-card shadow-card md:block">
+              <table className="w-full border-collapse">
+                <thead className="border-b border-ink/8">
+                  <tr>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Name
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Company
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Status
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Linked application
+                    </th>
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Contacted
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-ink/6">
+                  {filtered.map((contact) => (
+                    <tr
+                      key={contact.id}
+                      onClick={() => openView(contact.id)}
+                      className="cursor-pointer transition hover:bg-paper-dim/50"
+                    >
+                      <td className="px-4 py-3 text-sm font-medium text-ink">
+                        {contact.name}
+                        {contact.title && <span className="ml-1.5 text-xs text-ink-dim">{contact.title}</span>}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-ink-dim">{contact.company || '—'}</td>
+                      <td className="px-4 py-3">
+                        <ContactStatusBadge status={contact.status} size="sm" />
+                      </td>
+                      <td className="px-4 py-3 text-sm text-ink-dim">{applicationLabel(contact.applicationId) ?? '—'}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-ink-dim">{contact.dateContacted || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="space-y-2.5 md:hidden">
+              {filtered.map((contact) => (
+                <button
+                  key={contact.id}
+                  onClick={() => openView(contact.id)}
+                  className="block w-full rounded-xl2 border border-ink/8 bg-paper-card p-4 text-left shadow-card transition active:bg-paper-dim/50"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-ink">{contact.name}</p>
+                      {contact.title && <p className="truncate text-xs text-ink-dim">{contact.title}</p>}
+                    </div>
+                    <ContactStatusBadge status={contact.status} size="sm" />
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="truncate text-xs text-ink-dim">{contact.company || applicationLabel(contact.applicationId) || '—'}</p>
+                    <p className="font-mono text-xs text-ink-dim">{contact.dateContacted || 'No date'}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

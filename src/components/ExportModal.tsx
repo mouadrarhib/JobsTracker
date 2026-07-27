@@ -66,7 +66,7 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4" onClick={onClose}>
       <div
-        className="w-full max-w-md rounded-xl2 bg-paper-card p-6 shadow-panel"
+        className="w-full max-w-md overflow-y-auto rounded-xl2 bg-paper-card p-6 shadow-panel max-h-[85vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="font-display text-lg font-semibold text-ink">Export data</p>

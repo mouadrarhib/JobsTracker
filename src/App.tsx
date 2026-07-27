@@ -35,7 +35,7 @@ function AuthGate() {
             <div className="flex h-screen w-full flex-col overflow-hidden bg-paper">
               <DataErrorBanner />
               <MigrationBanner />
-              <div className="flex flex-1 overflow-hidden">
+              <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
                 <Sidebar />
                 <main className="flex-1 overflow-y-auto">
                   <Routes>

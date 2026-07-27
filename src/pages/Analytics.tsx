@@ -28,7 +28,7 @@ import {
 
 const GRID = '#E1E0D9'
 const AXIS_TEXT = { fill: '#898781', fontSize: 11, fontFamily: 'Inter, sans-serif' }
-const CARD = 'rounded-xl2 border border-ink/8 bg-paper-card p-5 shadow-card'
+const CARD = 'rounded-xl2 border border-ink/8 bg-paper-card p-4 shadow-card md:p-5'
 
 function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
@@ -67,7 +67,7 @@ export function Analytics() {
     return (
       <div>
         <PageHeader title="Analytics" subtitle="Trends across your job search." />
-        <div className="px-8 py-6">
+        <div className="px-4 py-6 md:px-8">
           <div className="flex flex-col items-center justify-center rounded-xl2 border border-dashed border-ink/15 py-24 text-center">
             <p className="font-display text-lg font-semibold text-ink">Nothing to chart yet</p>
             <p className="mt-1 max-w-sm text-sm text-ink-dim">
@@ -82,7 +82,7 @@ export function Analytics() {
   return (
     <div>
       <PageHeader title="Analytics" subtitle="Trends across your job search." />
-      <div className="space-y-5 px-8 py-6">
+      <div className="space-y-5 px-4 py-6 md:px-8">
         <ChartCard title="Applications over time" subtitle="Cumulative applications submitted, by week">
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={overTime} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>

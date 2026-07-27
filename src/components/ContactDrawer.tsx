@@ -95,8 +95,8 @@ export function ContactDrawer() {
       </div>
 
       {confirmingDelete && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-ink/40" onClick={() => setConfirmingDelete(false)}>
-          <div className="w-80 rounded-xl2 bg-paper-card p-5 shadow-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-ink/40 px-4" onClick={() => setConfirmingDelete(false)}>
+          <div className="w-full max-w-80 rounded-xl2 bg-paper-card p-5 shadow-panel" onClick={(e) => e.stopPropagation()}>
             <p className="font-display text-sm font-semibold text-ink">Delete this contact?</p>
             <p className="mt-1 text-sm text-ink-dim">This can't be undone.</p>
             <div className="mt-4 flex justify-end gap-2">

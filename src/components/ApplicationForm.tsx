@@ -58,7 +58,7 @@ export function ApplicationForm({
   return (
     <form onSubmit={handleSubmit} className="flex h-full flex-col">
       <div className="flex-1 space-y-6 overflow-y-auto scrollbar-thin px-6 py-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Company">
             <input
               required
@@ -80,7 +80,7 @@ export function ApplicationForm({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Location">
             <input
               className={inputClass}
@@ -113,7 +113,7 @@ export function ApplicationForm({
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Status">
             <select
               className={inputClass}
@@ -151,7 +151,7 @@ export function ApplicationForm({
           </div>
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Resume version">
             <input
               className={inputClass}
@@ -172,7 +172,7 @@ export function ApplicationForm({
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Contact person">
             <input
               className={inputClass}

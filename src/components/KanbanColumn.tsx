@@ -18,7 +18,7 @@ export function KanbanColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex w-72 shrink-0 flex-col rounded-xl2 border border-ink/8 bg-paper-dim/60 transition ${
+      className={`flex w-[80vw] max-w-72 shrink-0 flex-col rounded-xl2 border border-ink/8 bg-paper-dim/60 transition sm:w-72 ${
         isOver ? 'ring-2 ring-cobalt/40' : ''
       }`}
     >

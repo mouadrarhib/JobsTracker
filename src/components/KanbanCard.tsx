@@ -19,7 +19,7 @@ export function KanbanCard({ application, onClick }: { application: Application;
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`cursor-grab select-none rounded-xl border border-ink/8 bg-paper-card p-3.5 shadow-card transition active:cursor-grabbing ${
+      className={`touch-none cursor-grab select-none rounded-xl border border-ink/8 bg-paper-card p-3.5 shadow-card transition active:cursor-grabbing ${
         isDragging ? 'opacity-40' : 'hover:border-ink/15 hover:shadow-panel'
       }`}
     >

@@ -30,7 +30,7 @@ export function Dashboard() {
     <div>
       <PageHeader title="Dashboard" subtitle="Your job search, at a glance." />
 
-      <div className="px-8 py-6">
+      <div className="px-4 py-6 md:px-8">
         {applications.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl2 border border-dashed border-ink/15 py-24 text-center">
             <p className="font-display text-lg font-semibold text-ink">Nothing logged yet</p>

@@ -41,7 +41,7 @@ export function Pipeline() {
   return (
     <div className="flex h-full flex-col">
       <PageHeader title="Pipeline" subtitle="Drag applications between stages as things move." />
-      <div className="flex-1 overflow-x-auto px-8 py-6">
+      <div className="flex-1 overflow-x-auto px-4 py-6 md:px-8">
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="flex h-full gap-4">
             {STATUSES.map((status) => (

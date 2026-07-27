@@ -45,7 +45,7 @@ export function MigrationBanner() {
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-amber/30 bg-amber/10 px-8 py-3">
+    <div className="flex flex-col items-start gap-3 border-b border-amber/30 bg-amber/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 md:px-8">
       <div>
         <p className="text-sm font-medium text-ink">
           Found {localApplications.length} application{localApplications.length === 1 ? '' : 's'} saved locally from

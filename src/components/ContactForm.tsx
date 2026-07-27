@@ -59,7 +59,7 @@ export function ContactForm({
   return (
     <form onSubmit={handleSubmit} className="flex h-full flex-col">
       <div className="flex-1 space-y-6 overflow-y-auto scrollbar-thin px-6 py-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Name">
             <input
               required
@@ -118,7 +118,7 @@ export function ContactForm({
           </select>
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Email">
             <input
               type="email"

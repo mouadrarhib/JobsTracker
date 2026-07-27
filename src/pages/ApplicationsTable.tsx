@@ -109,7 +109,7 @@ export function ApplicationsTable() {
     <div>
       <PageHeader title="Applications" subtitle={`${filtered.length} of ${applications.length} shown`} />
 
-      <div className="flex flex-wrap items-center gap-2.5 px-8 pt-5">
+      <div className="flex flex-wrap items-center gap-2.5 px-4 pt-5 md:px-8">
         <input
           className={`${inputClass} w-56`}
           placeholder="Search company or role..."
@@ -146,7 +146,7 @@ export function ApplicationsTable() {
         )}
       </div>
 
-      <div className="px-8 py-5">
+      <div className="px-4 py-5 md:px-8">
         {applications.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl2 border border-dashed border-ink/15 py-24 text-center">
             <p className="font-display text-lg font-semibold text-ink">No applications yet</p>
@@ -160,42 +160,69 @@ export function ApplicationsTable() {
         ) : filtered.length === 0 ? (
           <p className="py-16 text-center text-sm text-ink-dim">No applications match these filters.</p>
         ) : (
-          <div className="overflow-hidden rounded-xl2 border border-ink/8 bg-paper-card shadow-card">
-            <table className="w-full border-collapse">
-              <thead className="border-b border-ink/8">
-                <tr>
-                  <SortHeader label="Company" sortKey="companyName" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-                  <SortHeader label="Role" sortKey="role" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-                  <SortHeader label="Location" sortKey="location" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-                  <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
-                    Status
-                  </th>
-                  <SortHeader label="Score" sortKey="score" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-                  <SortHeader label="Applied" sortKey="dateApplied" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-ink/6">
-                {filtered.map((app) => (
-                  <tr
-                    key={app.id}
-                    onClick={() => openView(app.id)}
-                    className="cursor-pointer transition hover:bg-paper-dim/50"
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-ink">{app.companyName}</td>
-                    <td className="px-4 py-3 text-sm text-ink-dim">{app.role}</td>
-                    <td className="px-4 py-3 text-sm text-ink-dim">{app.location || '—'}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={app.status} size="sm" />
-                    </td>
-                    <td className="px-4 py-3">
-                      <ScoreBadge score={app.score} size="sm" />
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-ink-dim">{app.dateApplied || '—'}</td>
+          <>
+            <div className="hidden overflow-hidden rounded-xl2 border border-ink/8 bg-paper-card shadow-card md:block">
+              <table className="w-full border-collapse">
+                <thead className="border-b border-ink/8">
+                  <tr>
+                    <SortHeader label="Company" sortKey="companyName" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                    <SortHeader label="Role" sortKey="role" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                    <SortHeader label="Location" sortKey="location" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                    <th className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-ink-dim/70">
+                      Status
+                    </th>
+                    <SortHeader label="Score" sortKey="score" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                    <SortHeader label="Applied" sortKey="dateApplied" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-ink/6">
+                  {filtered.map((app) => (
+                    <tr
+                      key={app.id}
+                      onClick={() => openView(app.id)}
+                      className="cursor-pointer transition hover:bg-paper-dim/50"
+                    >
+                      <td className="px-4 py-3 text-sm font-medium text-ink">{app.companyName}</td>
+                      <td className="px-4 py-3 text-sm text-ink-dim">{app.role}</td>
+                      <td className="px-4 py-3 text-sm text-ink-dim">{app.location || '—'}</td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={app.status} size="sm" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <ScoreBadge score={app.score} size="sm" />
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-ink-dim">{app.dateApplied || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="space-y-2.5 md:hidden">
+              {filtered.map((app) => (
+                <button
+                  key={app.id}
+                  onClick={() => openView(app.id)}
+                  className="block w-full rounded-xl2 border border-ink/8 bg-paper-card p-4 text-left shadow-card transition active:bg-paper-dim/50"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-ink">{app.companyName}</p>
+                      <p className="truncate text-sm text-ink-dim">{app.role}</p>
+                    </div>
+                    <ScoreBadge score={app.score} size="sm" />
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <StatusBadge status={app.status} size="sm" />
+                    <p className="font-mono text-xs text-ink-dim">
+                      {app.location ? `${app.location} · ` : ''}
+                      {app.dateApplied || 'No date'}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
