@@ -158,32 +158,70 @@ function MiniContacts() {
   )
 }
 
-function MiniChart() {
-  const bars = [
+function StatTile({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-ink/8 bg-paper-card px-2 py-2.5 text-center shadow-sm">
+      <p className="font-mono text-base font-semibold text-ink sm:text-lg">{value}</p>
+      <p className="mt-0.5 truncate text-[9px] uppercase tracking-wide text-ink-dim/70">{label}</p>
+    </div>
+  )
+}
+
+function AnalyticsMockup() {
+  const funnel = [
     { label: 'Applied', pct: 100 },
     { label: 'Phone Screen', pct: 55 },
     { label: 'Interview', pct: 30 },
     { label: 'Offer', pct: 8 },
   ]
+  const resumeVersions = [
+    { label: 'Resume_v4', pct: 84, color: '#008300' },
+    { label: 'Resume_v3', pct: 62, color: '#2A78D6' },
+    { label: 'Resume_v2', pct: 34, color: '#E34948' },
+  ]
+
   return (
-    <div className="w-full max-w-xs rounded-xl2 border border-ink/8 bg-paper-card p-4 shadow-card">
-      <p className="mb-3 text-xs font-semibold text-ink">Funnel</p>
-      <div className="space-y-2.5">
-        {bars.map((b, i) => (
-          <div key={b.label} className="flex items-center gap-2">
-            <span className="w-20 shrink-0 text-[10px] text-ink-dim">{b.label}</span>
-            <div className="h-2.5 flex-1 rounded-full bg-ink/5">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${b.pct}%`,
-                  backgroundColor: ['#86B6EF', '#5598E7', '#2A78D6', '#104281'][i],
-                }}
-              />
+    <div className="w-full max-w-sm space-y-3">
+      <div className="grid grid-cols-3 gap-2">
+        <StatTile label="Applications" value="24" />
+        <StatTile label="Response rate" value="68%" />
+        <StatTile label="Interviews" value="3" />
+      </div>
+
+      <div className="rounded-xl2 border border-ink/8 bg-paper-card p-4 shadow-card">
+        <p className="mb-3 text-xs font-semibold text-ink">Funnel</p>
+        <div className="space-y-2.5">
+          {funnel.map((b, i) => (
+            <div key={b.label} className="flex items-center gap-2">
+              <span className="w-20 shrink-0 text-[10px] text-ink-dim">{b.label}</span>
+              <div className="h-2.5 flex-1 rounded-full bg-ink/5">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${b.pct}%`,
+                    backgroundColor: ['#86B6EF', '#5598E7', '#2A78D6', '#104281'][i],
+                  }}
+                />
+              </div>
+              <span className="w-8 shrink-0 text-right font-mono text-[10px] text-ink-dim">{b.pct}%</span>
             </div>
-            <span className="w-8 shrink-0 text-right font-mono text-[10px] text-ink-dim">{b.pct}%</span>
-          </div>
-        ))}
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl2 border border-ink/8 bg-paper-card p-4 shadow-card">
+        <p className="mb-3 text-xs font-semibold text-ink">Resume performance</p>
+        <div className="space-y-2.5">
+          {resumeVersions.map((r) => (
+            <div key={r.label} className="flex items-center gap-2">
+              <span className="w-20 shrink-0 truncate font-mono text-[10px] text-ink-dim">{r.label}</span>
+              <div className="h-2.5 flex-1 rounded-full bg-ink/5">
+                <div className="h-full rounded-full" style={{ width: `${r.pct}%`, backgroundColor: r.color }} />
+              </div>
+              <span className="w-8 shrink-0 text-right font-mono text-[10px] text-ink-dim">{r.pct}%</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -381,7 +419,7 @@ export function Landing({ onGetStarted }: { onGetStarted: () => void }) {
           eyebrow="Analytics"
           title="Numbers that actually answer something."
           body="A real funnel showing where applications stall, response rates, and resume performance broken down by version — not vanity charts."
-          mockup={<MiniChart />}
+          mockup={<AnalyticsMockup />}
         />
         <FeatureBlock
           eyebrow="Export"
