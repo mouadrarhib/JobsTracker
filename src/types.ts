@@ -44,3 +44,19 @@ export interface Application {
 }
 
 export type ApplicationInput = Omit<Application, 'id' | 'dateLastUpdated'>
+
+export interface Contact {
+  id: string
+  name: string
+  title: string
+  company: string
+  linkedinUrl: string
+  email: string
+  phone: string
+  applicationId: string | null
+  dateContacted: string
+  notes: string
+  dateLastUpdated: string
+}
+
+export type ContactInput = Omit<Contact, 'id' | 'dateLastUpdated'>

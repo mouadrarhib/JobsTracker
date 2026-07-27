@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/pipeline', label: 'Pipeline' },
   { to: '/applications', label: 'Applications' },
+  { to: '/contacts', label: 'Contacts' },
   { to: '/analytics', label: 'Analytics' },
 ]
 

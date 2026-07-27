@@ -1,6 +1,9 @@
 import type { Application } from '../types'
 import { ScoreBadge } from './ScoreBadge'
 import { StatusBadge } from './StatusBadge'
+import { useContactsStore } from '../hooks/useContactsStore'
+import { useContactDrawer } from '../hooks/useContactDrawer'
+import { useDrawer } from '../hooks/useDrawer'
 
 function Row({ label, value }: { label: string; value?: string }) {
   if (!value) return null
@@ -21,6 +24,21 @@ export function ApplicationDetail({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const { contacts } = useContactsStore()
+  const { openCreate: openCreateContact, openView: openViewContact } = useContactDrawer()
+  const { close: closeApplicationDrawer } = useDrawer()
+  const linkedContacts = contacts.filter((c) => c.applicationId === application.id)
+
+  const handleOpenContact = (id: string) => {
+    closeApplicationDrawer()
+    openViewContact(id)
+  }
+
+  const handleAddContact = () => {
+    closeApplicationDrawer()
+    openCreateContact(application.id)
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-6 overflow-y-auto scrollbar-thin px-6 py-6">
@@ -72,6 +90,36 @@ export function ApplicationDetail({
             <p className="mt-1 whitespace-pre-wrap text-sm text-ink">{application.notes}</p>
           </div>
         )}
+
+        <div>
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-ink-dim/60">Contacts</p>
+            <button onClick={handleAddContact} className="text-xs font-medium text-cobalt hover:underline">
+              + Add contact
+            </button>
+          </div>
+          {linkedContacts.length === 0 ? (
+            <p className="mt-1.5 text-sm text-ink-dim">No one logged for this application yet.</p>
+          ) : (
+            <div className="mt-1.5 space-y-1.5">
+              {linkedContacts.map((contact) => (
+                <button
+                  key={contact.id}
+                  onClick={() => handleOpenContact(contact.id)}
+                  className="flex w-full items-center justify-between gap-3 rounded-lg border border-ink/8 px-3 py-2 text-left transition hover:bg-paper-dim/60"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-ink">{contact.name}</p>
+                    {contact.title && <p className="truncate text-xs text-ink-dim">{contact.title}</p>}
+                  </div>
+                  {contact.dateContacted && (
+                    <span className="shrink-0 font-mono text-[11px] text-ink-dim/70">{contact.dateContacted}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center justify-between border-t border-ink/10 bg-paper-card px-6 py-4">
