@@ -108,11 +108,3 @@ supabase/
 ├── contacts.sql          # contacts table + RLS
 └── seed_demo_user.sql     # optional demo data for a test account
 ```
-
----
-
-<div align="center">
-
-Built iteratively with [Claude Code](https://claude.com/claude-code) — from a static localStorage prototype to a deployed, RLS-secured, mobile-responsive app.
-
-</div>
