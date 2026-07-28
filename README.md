@@ -91,6 +91,10 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 
 `vercel.json` rewrites every route to `index.html` so client-side routing survives a direct link or a refresh.
 
+## 📚 Documentation
+
+Every module — Landing, Auth, Dashboard, Pipeline, Applications, Contacts, Analytics, Export, the data layer, shared components, and the database schema — has its own deep-dive doc in [`docs/`](docs/README.md).
+
 ## 📁 Project structure
 
 ```
