@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { STATUSES } from '../types'
 import { STATUS_META } from '../statusConfig'
@@ -20,14 +20,27 @@ function StampMark({ className = 'h-9 w-9' }: { className?: string }) {
   )
 }
 
+const PATH_D = 'M0 140 C 120 40, 220 200, 340 100 S 560 20, 680 110 S 780 150, 800 90'
+
 function HeroPathLine() {
   const pathRef = useRef<SVGPathElement>(null)
   const dotsRef = useRef<SVGGElement>(null)
+  const [dotPoints, setDotPoints] = useState<{ x: number; y: number }[]>([])
 
-  useEffect(() => {
+  // Sample points directly off the rendered path's geometry, rather than
+  // hand-guessing coordinates — guarantees every dot sits exactly on the line.
+  useLayoutEffect(() => {
+    const path = pathRef.current
+    if (!path) return
+    const length = path.getTotalLength()
+    const fractions = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    setDotPoints(fractions.map((f) => path.getPointAtLength(f * length)))
+  }, [])
+
+  useLayoutEffect(() => {
     const path = pathRef.current
     const dots = dotsRef.current
-    if (!path || !dots) return
+    if (!path || !dots || dotPoints.length === 0) return
 
     if (prefersReducedMotion()) {
       gsap.set(path, { strokeDashoffset: 0 })
@@ -39,38 +52,26 @@ function HeroPathLine() {
     gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
     gsap.set(dots.children, { opacity: 0, scale: 0.4, transformOrigin: 'center' })
 
+    // Dots appear first, as fixed waypoints — then the line draws across and
+    // visibly threads through each one, rather than decorating an already-drawn line.
     const tl = gsap.timeline({ delay: 0.3 })
-    tl.to(path, { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut' })
-    tl.to(dots.children, { opacity: 1, scale: 1, duration: 0.4, stagger: 0.12, ease: 'back.out(2)' }, '-=0.5')
-  }, [])
+    tl.to(dots.children, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.08, ease: 'back.out(2)' })
+    tl.to(path, { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut' }, '-=0.1')
+  }, [dotPoints])
 
   return (
     <svg
       viewBox="0 0 800 200"
-      className="pointer-events-none absolute inset-x-0 top-1/2 hidden w-full -translate-y-1/2 opacity-[0.14] sm:block"
-      preserveAspectRatio="xMidYMid slice"
+      className="pointer-events-none absolute inset-x-0 top-1/2 w-full -translate-y-1/2 opacity-[0.16]"
+      preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
     >
-      <path
-        ref={pathRef}
-        d="M0 140 C 120 40, 220 200, 340 100 S 560 20, 680 110 S 780 150, 800 90"
-        fill="none"
-        stroke="#2A78D6"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      <path ref={pathRef} d={PATH_D} fill="none" stroke="#2A78D6" strokeWidth="2.5" strokeLinecap="round" />
       <g ref={dotsRef}>
-        {[
-          [0, 140],
-          [170, 130],
-          [340, 100],
-          [500, 60],
-          [680, 110],
-          [800, 90],
-        ].map(([cx, cy]) => (
-          <g key={`${cx}-${cy}`}>
-            <circle cx={cx} cy={cy} r="9" fill="none" stroke="#D98E2B" strokeWidth="1.5" strokeDasharray="2.5 2.5" />
-            <circle cx={cx} cy={cy} r="3.5" fill="#D98E2B" />
+        {dotPoints.map((p, i) => (
+          <g key={i}>
+            <circle cx={p.x} cy={p.y} r="9" fill="none" stroke="#D98E2B" strokeWidth="1.5" strokeDasharray="2.5 2.5" />
+            <circle cx={p.x} cy={p.y} r="3.5" fill="#D98E2B" />
           </g>
         ))}
       </g>
@@ -270,7 +271,7 @@ function FeatureBlock({
 function PipelineStrip() {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = containerRef.current
     if (!el) return
 
@@ -286,6 +287,7 @@ function PipelineStrip() {
         duration: 0.5,
         stagger: 0.12,
         ease: 'power2.out',
+        immediateRender: true,
         scrollTrigger: { trigger: el, start: 'top 80%' },
       })
     })
@@ -312,7 +314,7 @@ function PipelineStrip() {
 export function Landing({ onGetStarted }: { onGetStarted: () => void }) {
   const heroRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = heroRef.current
     if (!el) return
 
@@ -356,12 +358,12 @@ export function Landing({ onGetStarted }: { onGetStarted: () => void }) {
       <section ref={heroRef} className="relative overflow-hidden px-4 py-16 md:px-10 md:py-24">
         <HeroPathLine />
         <div className="relative mx-auto max-w-3xl text-center">
-          <p data-hero-item className="text-xs font-semibold uppercase tracking-widest text-saffron">
+          <p data-hero-item className="text-xs font-semibold uppercase tracking-wide text-saffron sm:tracking-widest">
             A personal project — built solo, end to end
           </p>
           <h1
             data-hero-item
-            className="mt-4 font-display text-4xl font-semibold leading-tight text-ink sm:text-5xl md:text-6xl"
+            className="mt-4 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl md:text-5xl lg:text-6xl"
           >
             Job hunting, run like an engineer builds software.
           </h1>
